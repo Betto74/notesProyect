@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui.text.google.fonts)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -66,6 +67,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
 
     implementation ("com.maxkeppeler.sheets-compose-dialogs:core:1.0.2")
     implementation ("com.maxkeppeler.sheets-compose-dialogs:calendar:1.0.2")
