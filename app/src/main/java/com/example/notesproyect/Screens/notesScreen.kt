@@ -56,6 +56,8 @@ import com.maxkeppeler.sheets.clock.models.ClockSelection
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun notes(){
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val contentColor = MaterialTheme.colorScheme.onBackground
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("dd/mm/yyyy") }
@@ -84,20 +86,23 @@ fun notes(){
         }
     )
 
-    Column( ){
-        Row( modifier = Modifier.background(Color.Gray).padding(10.dp, top = 10.dp) ){
+    Column(modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
+        .fillMaxSize()){
+
+        Row( modifier = Modifier.padding(10.dp, top = 10.dp) ){
             IconButton(onClick = {  }, modifier = Modifier.size(40.dp)){
                 Icon(painter = painterResource(R.drawable.cancel), null, modifier = Modifier.size(24.dp))
             }
-            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
-                Text("Nueva nota", style = MaterialTheme.typography.titleSmall)
+            Box(modifier = Modifier.weight(1f).background(backgroundColor), contentAlignment = Alignment.Center){
+                Text("Nueva nota", style = MaterialTheme.typography.titleSmall, color = contentColor)
             }
             IconButton(onClick = {  },modifier = Modifier.size(40.dp)){
                 Icon(painter = painterResource(R.drawable.check), null, modifier = Modifier.size(24.dp))
             }
         }
 
-        Text("Titulo: ", style = MaterialTheme.typography.titleMedium,
+        Text("Titulo: ", style = MaterialTheme.typography.titleMedium, color = contentColor,
             modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp).fillMaxWidth())
         textBox(
             label = "Titulo",
@@ -110,7 +115,7 @@ fun notes(){
             modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth()
         )
 
-        Text("Descripcion: ", style = MaterialTheme.typography.titleMedium,
+        Text("Descripcion: ", style = MaterialTheme.typography.titleMedium, color = contentColor,
             modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp).fillMaxWidth())
         textBox(
             label = "Descripcion",

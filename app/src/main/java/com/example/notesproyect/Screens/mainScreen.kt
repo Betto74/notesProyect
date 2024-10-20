@@ -43,10 +43,14 @@ import com.example.notesproyect.R
 
 
 @Composable
-fun principal(){
+fun Principal(){
     var search by remember { mutableStateOf("") }
-
-    Box(modifier = Modifier.fillMaxSize()) {
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val contentColor = MaterialTheme.colorScheme.onBackground
+    Box(modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            ){
         Column(modifier = Modifier.fillMaxWidth()) {
             textBox(
                 label = "Buscar",
@@ -130,8 +134,9 @@ fun viewNote(
     titulo : String,
     descripcion : String,
     fecha : String,
+
 ){
-    Box( modifier =  Modifier.padding(15.dp).clip(RoundedCornerShape(16.dp)).background(Color.Gray)) {
+    Box( modifier =  Modifier.padding(15.dp).clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.primaryContainer)) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.weight(1f).padding(15.dp)) {
                 Text(titulo, style = MaterialTheme.typography.titleLarge)
@@ -162,7 +167,7 @@ fun desplegarAE(
             modifier = Modifier.width(150.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(), // Permite que la columna use todo el ancho
+                modifier = Modifier.fillMaxWidth(), // Permite que la columna usetodo el ancho
                 horizontalAlignment = Alignment.CenterHorizontally // Centra los botones
             ) {
                 TextButton(onClick = {
@@ -208,5 +213,5 @@ fun textBox(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun GreetingPreview() {
-    principal()
+    Principal()
 }

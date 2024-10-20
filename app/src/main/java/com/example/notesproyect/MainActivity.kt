@@ -12,7 +12,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.notesproyect.ui.theme.NotesProyectTheme
 import com.example.notesproyect.Screens.notes
-import com.example.notesproyect.Screens.principal
+import com.example.notesproyect.Screens.Principal
 import com.example.notesproyect.viewmodel.NotesViewModel
 
 
@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             NotesProyectTheme {
-                principal()
+                Principal()
                 //notes()
             }
         }
