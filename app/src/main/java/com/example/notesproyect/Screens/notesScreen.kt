@@ -1,11 +1,13 @@
 package com.example.notesproyect.Screens
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,9 +27,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +59,7 @@ import com.maxkeppeler.sheets.clock.models.ClockSelection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun notes(){
+fun notes() {
     val backgroundColor = MaterialTheme.colorScheme.background
     val contentColor = MaterialTheme.colorScheme.onBackground
     var title by remember { mutableStateOf("") }
@@ -85,94 +89,120 @@ fun notes(){
             minutes = m.toString()
         }
     )
-
-    Column(modifier = Modifier
-        .background(MaterialTheme.colorScheme.background)
-        .fillMaxSize()){
-
-        Row( modifier = Modifier.padding(10.dp, top = 10.dp) ){
-            IconButton(onClick = {  }, modifier = Modifier.size(40.dp)){
-                Icon(painter = painterResource(R.drawable.cancel), null, modifier = Modifier.size(24.dp))
-            }
-            Box(modifier = Modifier.weight(1f).background(backgroundColor), contentAlignment = Alignment.Center){
-                Text("Nueva nota", style = MaterialTheme.typography.titleSmall, color = contentColor)
-            }
-            IconButton(onClick = {  },modifier = Modifier.size(40.dp)){
-                Icon(painter = painterResource(R.drawable.check), null, modifier = Modifier.size(24.dp))
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = { /* Acción de cancelar */ }) {
+                        Icon(painter = painterResource(R.drawable.cancel), contentDescription = "Cancelar",modifier = Modifier.size(24.dp))
+                    }
+                },
+                title = {
+                    Box(modifier =  Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Text("Nueva nota", style = MaterialTheme.typography.titleMedium)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* Acción de guardar */ }) {
+                        Icon(painter = painterResource(R.drawable.check), contentDescription = "Guardar",modifier = Modifier.size(24.dp))
+                    }
+                },
+            )
         }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues).background(MaterialTheme.colorScheme.background)
+                .fillMaxSize()
+        ) {
 
-        Text("Titulo: ", style = MaterialTheme.typography.titleMedium, color = contentColor,
-            modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp).fillMaxWidth())
-        textBox(
-            label = "Titulo",
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            value = title,
-            onValueChanged = { title = it },
-            modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth()
-        )
 
-        Text("Descripcion: ", style = MaterialTheme.typography.titleMedium, color = contentColor,
-            modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp).fillMaxWidth())
-        textBox(
-            label = "Descripcion",
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            value = description,
-            onValueChanged = { description = it },
-            modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth()
-        )
+            InputField(label = "Título", value = title, onValueChanged = { title = it })
 
-        TextButton(onClick = {}, modifier =  Modifier.padding(start = 15.dp, end = 15.dp)) {
-            Text("Agregar archivo", style = MaterialTheme.typography.titleMedium )
-        }
+            InputField(
+                label = "Descripción",
+                value = description,
+                onValueChanged = { description = it })
 
-        Row( modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp) ){
-            Column( modifier = Modifier.weight(1f),horizontalAlignment = Alignment.CenterHorizontally ){
-                Text("Fecha",style = MaterialTheme.typography.titleMedium)
-                Button( onClick = {
-                    calendarState.show()
-                } ) {
-                    Text(date)
+
+            TextButton(onClick = {}, modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
+                Text("Agregar archivo", style = MaterialTheme.typography.titleMedium)
+            }
+
+            Row(modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp)) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Fecha", style = MaterialTheme.typography.titleMedium)
+                    Button(onClick = {
+                        calendarState.show()
+                    }) {
+                        Text(date)
+                    }
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Hora", style = MaterialTheme.typography.titleMedium)
+                    Button(onClick = {
+                        clockState.show()
+                    }) {
+                        Text("$hours:$minutes")
+                    }
                 }
             }
-            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally){
-                Text("Hora",style = MaterialTheme.typography.titleMedium)
-                Button( onClick = {
-                    clockState.show()
-                } ) {
-                    Text("$hours:$minutes")
-                }
+
+            TextButton(onClick = {}, modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
+                Text("Agregar notificacion", style = MaterialTheme.typography.titleMedium)
             }
-        }
 
-        TextButton(onClick = {}, modifier =  Modifier.padding(start = 15.dp, end = 15.dp)) {
-            Text("Agregar notificacion", style = MaterialTheme.typography.titleMedium )
         }
-
     }
 
+}
 
-
-
-
-
-
-
-
-
+@Composable
+fun InputField(label: String, value: String, onValueChanged: (String) -> Unit) {
+    Text(label, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp).fillMaxWidth())
+    textBox(
+        label = label,
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+        value = value,
+        onValueChanged = onValueChanged,
+        modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth()
+    )
 }
 
 
 
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview( showBackground = true, showSystemUi = true)
 @Composable
 fun Preview() {
     notes()
 }
+
+/*
+*
+@Composable
+fun Header(
+    backgroundColor: Color,
+    contentColor: Color
+){
+    Row( modifier = Modifier.padding(10.dp, top = 10.dp) ){
+        IconButton(onClick = {  }, modifier = Modifier.size(40.dp)){
+            Icon(painter = painterResource(R.drawable.cancel), null, modifier = Modifier.size(24.dp))
+        }
+        Box(modifier = Modifier.weight(1f).background(backgroundColor), contentAlignment = Alignment.Center){
+            Text("Nueva nota", style = MaterialTheme.typography.titleSmall, color = contentColor)
+        }
+        IconButton(onClick = {  },modifier = Modifier.size(40.dp)){
+            Icon(painter = painterResource(R.drawable.check), null, modifier = Modifier.size(24.dp))
+        }
+    }
+}
+
+*
+* */
