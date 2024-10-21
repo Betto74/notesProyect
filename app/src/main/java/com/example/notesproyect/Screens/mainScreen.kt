@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,6 +31,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,17 +47,24 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.notesproyect.R
 import com.example.notesproyect.data.Nota
 import com.example.notesproyect.data.TipoNota
+import com.example.notesproyect.navegacion.AppScreen
+import com.example.notesproyect.viewmodel.NotesViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Principal() {
-    var search by remember { mutableStateOf("") }
+fun Principal(viewModel: NotesViewModel, navController: NavController) {
+   // var search by remember { mutableStateOf("") }
+    val  buscar : String by viewModel.buscar.collectAsState()
+    val notas : List<Nota> by viewModel.notas.collectAsState()
+    val tareas : List<Nota> by viewModel.tareas.collectAsState()
+
     val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse("20/10/2023") ?: Date()
     val notes = List(10) { Nota(TipoNota.NOTA,"Titulo", "Descriasdasd\npcion", formatoFecha) }
 
@@ -69,21 +79,11 @@ fun Principal() {
         ) {
             Column() {
 
-                textBox(
-                    label = "Buscar",
-                    trailingIcon = R.drawable.search,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    value = search,
-                    onValueChanged = { search = it },
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth()
-                )
+                SearchBar(buscar,{viewModel.onSearchChange(it, TipoNota.NOTA)})
                 NoteList(notes)
             }
-            BottomFloatingButton(onClick = {}, Modifier.align(Alignment.BottomEnd))
+            BottomFloatingButton(Modifier.align(Alignment.BottomEnd), navController)
+            BottomButtons(Modifier.align(Alignment.BottomCenter))
         }
     }
 }
@@ -111,14 +111,11 @@ fun SearchBar(search: String, onSearchChange: (String) -> Unit) {
     textBox(
         label = "Buscar",
         trailingIcon = R.drawable.search,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
-        ),
         value = search,
         onValueChanged = onSearchChange,
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth()
+        modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(),
+        onTextFieldChanged = onSearchChange
     )
 }
 
@@ -138,18 +135,81 @@ fun NoteList(notes: List<Nota>) {
 
 }
 @Composable
-fun BottomFloatingButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun BottomFloatingButton(modifier: Modifier = Modifier, navController: NavController) {
     Box(
         modifier = modifier
-            .padding(bottom = 70.dp, end = 40.dp)
+            .padding(bottom = 90.dp, end = 40.dp)
     ) {
-        desplegarOpciones()
+        desplegarOpciones(navController = navController)
+    }
+}
+@Composable
+fun BottomButtons(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp)
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp) // Sin padding para que ocupe todo el espacio
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            painter = painterResource(R.drawable.task),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(35.dp) // Tamaño del icono
+                        )
+                        Text(
+                            text = "Tarea", // Cambia este texto según sea necesario
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp) // Sin padding para que ocupe todo el espacio
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            painter = painterResource(R.drawable.note),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(35.dp) // Tamaño del icono
+                        )
+                        Text(
+                            text = "Nota", // Cambia este texto según sea necesario
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
+
 @Composable
 fun desplegarOpciones(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -165,11 +225,11 @@ fun desplegarOpciones(
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
-                TextButton(onClick = { expanded = false })
+                TextButton(onClick = { navController.navigate(route = AppScreen.SecondScreen.route+"/"+TipoNota.NOTA) })
                 {
                     Text("Agregar nota")
                 }
-                TextButton(onClick = { expanded = false }) {
+                TextButton(onClick = { navController.navigate(route = AppScreen.SecondScreen.route+"/"+TipoNota.TAREA) }) {
                     Text("Agregar tarea")
                 }
             }
@@ -253,11 +313,11 @@ fun desplegarAE(
 fun textBox(
     label: String,
     @DrawableRes trailingIcon: Int ? = null,
-    keyboardOptions: KeyboardOptions,
     value: String,
     onValueChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
-    shape: Shape = RectangleShape
+    shape: Shape = RectangleShape,
+    onTextFieldChanged:(String) -> Unit
 ){
     TextField(
         value = value,
@@ -267,9 +327,8 @@ fun textBox(
         shape = shape,
         singleLine = true,
         modifier = modifier,
-        onValueChange = onValueChanged,
+        onValueChange = {onTextFieldChanged(it)},
         label = { Text(label) },
-        keyboardOptions = keyboardOptions
     )
 }
 
@@ -277,5 +336,5 @@ fun textBox(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun GreetingPreview() {
-    Principal()
+    //Principal(NotesViewModel())
 }

@@ -47,7 +47,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.notesproyect.R
+import com.example.notesproyect.data.TipoNota
+import com.example.notesproyect.navegacion.AppNavigation
+import com.example.notesproyect.navegacion.AppScreen
+import com.example.notesproyect.viewmodel.NotesViewModel
 import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
@@ -57,9 +62,11 @@ import com.maxkeppeler.sheets.clock.models.ClockConfig
 import com.maxkeppeler.sheets.clock.models.ClockSelection
 
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun notes() {
+fun Notas( viewModel: NotesViewModel , navController: NavController, text: String?) {
     val backgroundColor = MaterialTheme.colorScheme.background
     val contentColor = MaterialTheme.colorScheme.onBackground
     var title by remember { mutableStateOf("") }
@@ -93,7 +100,7 @@ fun notes() {
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = { /* Acción de cancelar */ }) {
+                    IconButton(onClick = {navController.popBackStack()}) {
                         Icon(painter = painterResource(R.drawable.cancel), contentDescription = "Cancelar",modifier = Modifier.size(24.dp))
                     }
                 },
@@ -117,45 +124,43 @@ fun notes() {
         ) {
 
 
-            InputField(label = "Título", value = title, onValueChanged = { title = it })
+            InputField(label = "Título", value = title, onValueChanged = { title = it } , viewModel = viewModel)
 
-            InputField(
-                label = "Descripción",
-                value = description,
-                onValueChanged = { description = it })
+            InputField(label = "Descripción", value = description, onValueChanged = { description = it }, viewModel = viewModel)
 
 
             TextButton(onClick = {}, modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
                 Text("Agregar archivo", style = MaterialTheme.typography.titleMedium)
             }
-
-            Row(modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp)) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Fecha", style = MaterialTheme.typography.titleMedium)
-                    Button(onClick = {
-                        calendarState.show()
-                    }) {
-                        Text(date)
+            if( text == TipoNota.TAREA.toString() ) {
+                Row(modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp)) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Fecha", style = MaterialTheme.typography.titleMedium)
+                        Button(onClick = {
+                            calendarState.show()
+                        }) {
+                            Text(date)
+                        }
+                    }
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text("Hora", style = MaterialTheme.typography.titleMedium)
+                        Button(onClick = {
+                            clockState.show()
+                        }) {
+                            Text("$hours:$minutes")
+                        }
                     }
                 }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Hora", style = MaterialTheme.typography.titleMedium)
-                    Button(onClick = {
-                        clockState.show()
-                    }) {
-                        Text("$hours:$minutes")
-                    }
-                }
-            }
 
-            TextButton(onClick = {}, modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
-                Text("Agregar notificacion", style = MaterialTheme.typography.titleMedium)
+                TextButton(onClick = {}, modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
+                    Text("Agregar notificacion", style = MaterialTheme.typography.titleMedium)
+                }
             }
 
         }
@@ -164,14 +169,14 @@ fun notes() {
 }
 
 @Composable
-fun InputField(label: String, value: String, onValueChanged: (String) -> Unit) {
+fun InputField(label: String, value: String, onValueChanged: (String) -> Unit, viewModel: NotesViewModel) {
     Text(label, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp).fillMaxWidth())
     textBox(
         label = label,
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
         value = value,
         onValueChanged = onValueChanged,
-        modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth()
+        modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(),
+        onTextFieldChanged = {}
     )
 }
 
@@ -181,7 +186,8 @@ fun InputField(label: String, value: String, onValueChanged: (String) -> Unit) {
 @Preview( showBackground = true, showSystemUi = true)
 @Composable
 fun Preview() {
-    notes()
+
+ //   Notas(NotesViewModel())
 }
 
 /*
