@@ -1,8 +1,10 @@
 package com.example.notesproyect.Screens
 
 import android.content.res.Configuration
+import android.os.Build
 import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +35,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,61 +63,27 @@ import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 import com.maxkeppeler.sheets.clock.ClockDialog
 import com.maxkeppeler.sheets.clock.models.ClockConfig
 import com.maxkeppeler.sheets.clock.models.ClockSelection
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Date
 
 
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Notas( viewModel: NotesViewModel , navController: NavController, text: String?) {
     val backgroundColor = MaterialTheme.colorScheme.background
     val contentColor = MaterialTheme.colorScheme.onBackground
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("dd/mm/yyyy") }
-    var time by remember { mutableStateOf("") }
-    var hours by remember { mutableStateOf("00") }
-    var minutes by remember { mutableStateOf("00") }
 
-    val calendarState = rememberSheetState()
-    CalendarDialog(
-        state = calendarState,
-        selection = CalendarSelection.Date { d ->
-            date = d.toString()
-        }
-    )
 
-    val clockState = rememberSheetState()
 
-    ClockDialog(
-        state = clockState,
-        config = ClockConfig(
-            is24HourFormat = true
-        ),
-        selection = ClockSelection.HoursMinutes { h, m ->
-            hours = h.toString()
-            minutes = m.toString()
-        }
-    )
+    val  titulo : String by viewModel.titulo.collectAsState()
+    val  descripcion : String by viewModel.descripcion.collectAsState()
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = {navController.popBackStack()}) {
-                        Icon(painter = painterResource(R.drawable.cancel), contentDescription = "Cancelar",modifier = Modifier.size(24.dp))
-                    }
-                },
-                title = {
-                    Box(modifier =  Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text("Nueva nota", style = MaterialTheme.typography.titleMedium)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Acción de guardar */ }) {
-                        Icon(painter = painterResource(R.drawable.check), contentDescription = "Guardar",modifier = Modifier.size(24.dp))
-                    }
-                },
-            )
+            Top(navController,text,viewModel)
         }
     ) { paddingValues ->
         Column(
@@ -124,40 +93,15 @@ fun Notas( viewModel: NotesViewModel , navController: NavController, text: Strin
         ) {
 
 
-            InputField(label = "Título", value = title, onValueChanged = { title = it } , viewModel = viewModel)
+            InputField(label = "Título", value = titulo, onValueChanged = {viewModel.updateTitle(it)})
 
-            InputField(label = "Descripción", value = description, onValueChanged = { description = it }, viewModel = viewModel)
+            InputField(label = "Descripción", value = descripcion, onValueChanged = { viewModel.updateDescription(it)})
 
 
             TextButton(onClick = {}, modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
                 Text("Agregar archivo", style = MaterialTheme.typography.titleMedium)
             }
             if( text == TipoNota.TAREA.toString() ) {
-                Row(modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp)) {
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("Fecha", style = MaterialTheme.typography.titleMedium)
-                        Button(onClick = {
-                            calendarState.show()
-                        }) {
-                            Text(date)
-                        }
-                    }
-                    Column(
-                        modifier = Modifier.weight(1f),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("Hora", style = MaterialTheme.typography.titleMedium)
-                        Button(onClick = {
-                            clockState.show()
-                        }) {
-                            Text("$hours:$minutes")
-                        }
-                    }
-                }
-
                 TextButton(onClick = {}, modifier = Modifier.padding(start = 15.dp, end = 15.dp)) {
                     Text("Agregar notificacion", style = MaterialTheme.typography.titleMedium)
                 }
@@ -168,15 +112,105 @@ fun Notas( viewModel: NotesViewModel , navController: NavController, text: Strin
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputField(label: String, value: String, onValueChanged: (String) -> Unit, viewModel: NotesViewModel) {
+fun Top(navController: NavController,text:String?, viewModel: NotesViewModel){
+    TopAppBar(
+        navigationIcon = {
+            IconButton(onClick = {navController.popBackStack()}) {
+                Icon(painter = painterResource(R.drawable.cancel), contentDescription = "Cancelar",modifier = Modifier.size(24.dp))
+            }
+        },
+        title = {
+            Box(modifier =  Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                if( text == TipoNota.NOTA.toString() )Text("Nueva nota", style = MaterialTheme.typography.titleMedium)
+                else Text("Nueva tarea", style = MaterialTheme.typography.titleMedium)
+
+            }
+        },
+        actions = {
+            val tipo : TipoNota
+            if( text.isNullOrBlank() || text == TipoNota.NOTA.toString() )tipo = TipoNota.NOTA
+            else tipo = TipoNota.TAREA
+            IconButton(onClick = {
+                viewModel.saveNote(tipo)
+                navController.popBackStack()
+            }) {
+                Icon(painter = painterResource(R.drawable.check), contentDescription = "Guardar",modifier = Modifier.size(24.dp))
+            }
+        },
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FechaHoraPicker(viewModel: NotesViewModel) {
+
+    val  horas : Int by viewModel.horas.collectAsState()
+    val  minutos : Int by viewModel.minutos.collectAsState()
+    val  fecha : LocalDate by viewModel.fecha.collectAsState()
+
+    val calendarState = rememberSheetState()
+    CalendarDialog(
+        state = calendarState,
+        selection = CalendarSelection.Date { d ->
+
+            viewModel.updateDate(d)
+        }
+    )
+
+
+    val clockState = rememberSheetState()
+
+    ClockDialog(
+        state = clockState,
+        config = ClockConfig(
+            is24HourFormat = true
+        ),
+        selection = ClockSelection.HoursMinutes { h, m ->
+            viewModel.updateTime(h,m)
+        }
+    )
+
+    Row(modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Fecha", style = MaterialTheme.typography.titleMedium)
+            Button(onClick = {
+                calendarState.show()
+            }) {
+                Text(fecha.toString())
+            }
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Hora", style = MaterialTheme.typography.titleMedium)
+            Button(onClick = {
+                clockState.show()
+            }) {
+                val formattedTime = String.format("%02d:%02d", horas, minutos)
+                Text(formattedTime)
+            }
+        }
+    }
+
+}
+
+@Composable
+fun InputField(label: String, value: String, onValueChanged: (String) -> Unit) {
     Text(label, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = 15.dp, top = 20.dp, end = 15.dp).fillMaxWidth())
     textBox(
         label = label,
         value = value,
         onValueChanged = onValueChanged,
         modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(),
-        onTextFieldChanged = {}
+        onValueChange = onValueChanged
     )
 }
 

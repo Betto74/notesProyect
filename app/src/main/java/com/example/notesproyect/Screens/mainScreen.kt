@@ -1,6 +1,8 @@
 package com.example.notesproyect.Screens
 
+import android.os.Build
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,20 +14,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -43,8 +45,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -57,16 +57,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Principal(viewModel: NotesViewModel, navController: NavController) {
    // var search by remember { mutableStateOf("") }
     val  buscar : String by viewModel.buscar.collectAsState()
-    val notas : List<Nota> by viewModel.notas.collectAsState()
-    val tareas : List<Nota> by viewModel.tareas.collectAsState()
+    val lista: List<Nota> by viewModel.listaFiltradas.collectAsState()
 
-    val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse("20/10/2023") ?: Date()
-    val notes = List(10) { Nota(TipoNota.NOTA,"Titulo", "Descriasdasd\npcion", formatoFecha) }
+
+
 
     Scaffold(
         topBar = { NotesTopBar("Notes") }
@@ -78,12 +78,15 @@ fun Principal(viewModel: NotesViewModel, navController: NavController) {
                 .padding(paddingValues)
         ) {
             Column() {
+                // Contenido de cada pestaña
+                SearchBar(buscar,{viewModel.onSearchChange(it)}, Modifier.padding(start = 15.dp, end = 15.dp, bottom = 5.dp).fillMaxWidth(),)
+                NoteList(lista,viewModel)
 
-                SearchBar(buscar,{viewModel.onSearchChange(it, TipoNota.NOTA)})
-                NoteList(notes)
             }
             BottomFloatingButton(Modifier.align(Alignment.BottomEnd), navController)
-            BottomButtons(Modifier.align(Alignment.BottomCenter))
+           // BottomButtons(Modifier.align(Alignment.BottomCenter))B
+            BottomNav(Modifier.align(Alignment.BottomCenter), viewModel)
+
         }
     }
 }
@@ -107,33 +110,34 @@ fun NotesTopBar(
 }
 
 @Composable
-fun SearchBar(search: String, onSearchChange: (String) -> Unit) {
+fun SearchBar(search: String, onSearchChange: (String) -> Unit, modifier: Modifier) {
     textBox(
         label = "Buscar",
         trailingIcon = R.drawable.search,
         value = search,
         onValueChanged = onSearchChange,
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.padding(start = 15.dp, end = 15.dp).fillMaxWidth(),
-        onTextFieldChanged = onSearchChange
+        modifier = modifier,
+        onValueChange = onSearchChange
     )
 }
 
 @Composable
-fun NoteList(notes: List<Nota>) {
+fun NoteList(notes: List<Nota>,viewModel: NotesViewModel) {
+
     LazyColumn(
+
     ) {
         items(notes.size) { index ->
             val note = notes[index]
-            viewNote(note.titulo, note.descripcion, note.fechaCreacion.toString())
+            viewNote(note.titulo, note.descripcion, note.fechaCreacion.toString(),viewModel)
         }
         item {
             Spacer(modifier = Modifier.height(100.dp)) // Espacio adicional al final
         }
     }
-
-
 }
+
 @Composable
 fun BottomFloatingButton(modifier: Modifier = Modifier, navController: NavController) {
     Box(
@@ -143,6 +147,59 @@ fun BottomFloatingButton(modifier: Modifier = Modifier, navController: NavContro
         desplegarOpciones(navController = navController)
     }
 }
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun BottomNav(modifier: Modifier = Modifier, viewModel: NotesViewModel){
+
+    val  selectedTabIndex : Int by viewModel.selectedTabIndex.collectAsState()
+
+    TabRow(
+        selectedTabIndex = selectedTabIndex,
+        modifier = modifier
+       // modifier = modifier.align(Alignment.BottomCenter).background(MaterialTheme.colorScheme.primary)
+        //backgroundColor = MaterialTheme.colorScheme.primary
+    ) {
+
+        Tab(
+            selected = selectedTabIndex == 0,
+            modifier = Modifier.height(50.dp),
+            onClick = { viewModel.selectTab(0)}
+
+        ) {
+            Row() {
+                Icon(
+                    painter = painterResource(R.drawable.note),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp) // Tamaño del ícono
+                )
+                Spacer(modifier = Modifier.width(8.dp)) // Espacio entre ícono y texto
+                Text("Notas", color = Color.White)
+            }
+        }
+        Tab(
+            selected = selectedTabIndex == 1,
+            modifier = Modifier.height(50.dp),
+            onClick = { viewModel.selectTab(1) }
+        ) {
+            Row() {
+                Icon(
+                    painter = painterResource(R.drawable.task),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp) // Tamaño del ícono
+                )
+                Spacer(modifier = Modifier.width(8.dp)) // Espacio entre ícono y texto
+                Text("Tareas", color = Color.White)
+            }
+        }
+
+    }
+
+}
+
 @Composable
 fun BottomButtons(modifier: Modifier = Modifier) {
     Box(
@@ -225,11 +282,21 @@ fun desplegarOpciones(
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
-                TextButton(onClick = { navController.navigate(route = AppScreen.SecondScreen.route+"/"+TipoNota.NOTA) })
+                TextButton(
+                    modifier = modifier.fillMaxWidth(),
+                    onClick = {
+                        expanded = false
+                        navController.navigate(route = AppScreen.SecondScreen.route+"/"+TipoNota.NOTA)
+                    } )
                 {
                     Text("Agregar nota")
                 }
-                TextButton(onClick = { navController.navigate(route = AppScreen.SecondScreen.route+"/"+TipoNota.TAREA) }) {
+                TextButton(
+                    modifier = modifier.fillMaxWidth(),
+                    onClick = {
+                        expanded = false
+                        navController.navigate(route = AppScreen.SecondScreen.route+"/"+TipoNota.TAREA)
+                    }) {
                     Text("Agregar tarea")
                 }
             }
@@ -250,15 +317,29 @@ fun desplegarOpciones(
         }
     }
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun viewNote(
     titulo : String,
     descripcion : String,
     fecha : String,
-
+    viewModel: NotesViewModel
     ){
+
+
     Box( modifier =  Modifier.padding(start = 15.dp, end = 15.dp, top=10.dp).clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.primaryContainer)) {
+        var isChecked by remember { mutableStateOf(false) }
+        val index: Int by viewModel.selectedTabIndex.collectAsState()
         Row(modifier = Modifier.fillMaxWidth()) {
+
+            if( index==1 ){
+                Checkbox(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    checked = isChecked,
+                    onCheckedChange = { isChecked = it } // Actualiza el estado al hacer clic
+                )
+            }
+
             Column(modifier = Modifier.weight(1f).padding(15.dp)) {
                 Text(titulo, style = MaterialTheme.typography.titleLarge)
                 //Spacer(modifier = Modifier.height(1.dp))
@@ -266,7 +347,10 @@ fun viewNote(
                 //Spacer(modifier = Modifier.height(2.dp))
                 Text(fecha)
             }
+
             desplegarAE()
+
+
         }
     }
 }
@@ -291,12 +375,16 @@ fun desplegarAE(
                 modifier = Modifier.fillMaxWidth(), // Permite que la columna usetodo el ancho
                 horizontalAlignment = Alignment.CenterHorizontally // Centra los botones
             ) {
-                TextButton(onClick = {
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
                     expanded = false
                 }) {
                     Text("Editar")
                 }
-                TextButton(onClick = {
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
                     expanded = false
                 }) {
                     Text("Eliminar")
@@ -317,7 +405,7 @@ fun textBox(
     onValueChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
-    onTextFieldChanged:(String) -> Unit
+    onValueChange:(String) -> Unit
 ){
     TextField(
         value = value,
@@ -327,7 +415,7 @@ fun textBox(
         shape = shape,
         singleLine = true,
         modifier = modifier,
-        onValueChange = {onTextFieldChanged(it)},
+        onValueChange = {onValueChange(it)},
         label = { Text(label) },
     )
 }

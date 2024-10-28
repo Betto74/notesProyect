@@ -1,8 +1,8 @@
 package com.example.notesproyect.data
 
-import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.Date
-import java.util.Locale
 
 enum class TipoNota {
     NOTA,
@@ -22,9 +22,7 @@ data class Nota(
     /** Archivos asociados (imágenes, audios, videos, etc.) **/
     val archivosAdjuntos: List<Archivo> = emptyList(),
     /** Fecha de vencimiento (solo para tareas) **/
-    val fechaVencimiento: Date? = null,
-    /** Hora de vencimiento (solo para tareas) **/
-    val horaVencimiento: Date? = null,
+    val fechaVencimiento: LocalDateTime? = null,
     /** Recordatorio en formato de tiempo (solo para tareas) **/
     val recordatorio: String? = null
 )
