@@ -122,6 +122,7 @@ fun SearchBar(search: String, onSearchChange: (String) -> Unit, modifier: Modifi
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NoteList(notes: List<Nota>,viewModel: NotesViewModel) {
 
