@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_label">Search</string>
+    <string name="notes">Notes</string>
+    <string name="tasks">Tasks</string>
+    <string name="addNote">Add note</string>
+    <string name="addTask">Add task</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="addFile">Add file</string>
+    <string name="addNoti">Add Notification</string> newTask
+    <string name="newTask">New task</string>
+    <string name="newNote">New note</string> time
+    <string name="time">Time</string>
+    <string name="date">Date</string>
+    <string name="creationDate">Creation Date</string>
+    <string name="expirationDate">Expiration Date</string>
+    <string name="done">Done</string>
+    <string name="noteDetails">Note details</string>
+    <string name="noteNotFound">Note not found</string>
+    <string name="reminder">Reminder</string>
+    <string name="accept">Accept</string>
+    <string name="cancel">Cancel</string>
+    <string name="take_pic">Take Picture</string>
+    <string name="take_vid">Record Video</string>
+    <string name="start_rec">Record Audio</string>
+    <string name="stop_rec">Stop Recording</string>
+    <string name="minutes">Minute(s) Before</string>
+    <string name="hours">Hours Before</string>
+    <string name="days">Days Before</string>
+    <string name="weeks">Weeks Before</string>
+    <string name="atmoment">At moment</string>
+    <string name="minutesbefore">Minute(s) Before</string>
+    <string name="hoursbefore">Hour(s) Before</string>
+    <string name="daysbefore">Day(s) Before</string>
+    <string name="weeksbefore">Week(s) Before</string>
+    <string name="msecbefore">Millisecond(s) Before</string>
+</resources>

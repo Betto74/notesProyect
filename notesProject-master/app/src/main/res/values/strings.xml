@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name" translatable="false">notesProyect2</string>
+    <string name="search_label">Buscar</string>
+    <string name="notes">Notas</string>
+    <string name="tasks">Tareas</string>
+    <string name="addNote">Agregar nota</string>
+    <string name="addTask">Agregar tarea</string>
+    <string name="title">Título</string>
+    <string name="description">Descripción</string>
+    <string name="addFile">Agregar archivo</string>
+    <string name="addNoti">Agregar notificación</string>
+    <string name="newTask">Nueva tarea</string>
+    <string name="newNote">Nueva nota</string>
+    <string name="time">Hora</string>
+    <string name="date">Fecha</string>
+    <string name="creationDate">Fecha de Creación</string>
+    <string name="expirationDate">Fecha de Vencimiento</string>
+    <string name="done">Hecho</string>
+    <string name="noteDetails">Detalles de la nota</string>
+    <string name="noteNotFound">Nota no encontrada</string>
+    <string name="reminder">Recordatorio</string>
+    <string name="accept">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="take_pic">Tomar Foto</string>
+    <string name="take_vid">Grabar Video</string>
+    <string name="start_rec">Grabar Audio</string>
+    <string name="stop_rec">Detener Grabación</string>
+    <string name="minutes">Minutos Antes</string>
+    <string name="hours">Horas Antes</string>
+    <string name="days">Dias Antes</string>
+    <string name="weeks">Semanas Antes</string>
+    <string name="atmoment">En el momento</string>
+    <string name="minutesbefore">Minuto(s) Antes</string>
+    <string name="hoursbefore">Hora(s) Antes</string>
+    <string name="daysbefore">Dia(s) Antes</string>
+    <string name="weeksbefore">Semana(s) Antes</string>
+    <string name="msecbefore">Milisegundo(s) Antes</string>
+</resources>
